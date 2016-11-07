@@ -21,7 +21,7 @@ public class HbaseClient<T> implements IHbaseClient {
     static {
         configuration = HBaseConfiguration.create();
         configuration.set("hbase.zookeeper.properity.clientPort", "2181");
-        configuration.set("hbase.zookeeper.quorum", "192.168.1.3");
+        configuration.set("hbase.zookeeper.quorum", "master");
         try {
             hBaseAdmin = new HBaseAdmin(configuration);
         } catch (IOException e) {
