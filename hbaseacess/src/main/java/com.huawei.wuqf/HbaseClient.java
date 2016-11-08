@@ -4,86 +4,106 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by wuqf on 10/4/16.
  */
-public class HbaseClient<T> implements IHbaseClient {
+public class HbaseClient implements IHbaseClient {
 
-    private static Configuration configuration;
-    private static HBaseAdmin hBaseAdmin;
+    private  Configuration configuration;
+    private  Admin hBaseAdmin;
 
-    static {
+    private Connection connection ;
+
+    public HbaseClient(String zookeeperIp,String zookeeperPort,int coonnectionPoolSize){
+
+        ExecutorService executor = Executors.newFixedThreadPool(coonnectionPoolSize);
         configuration = HBaseConfiguration.create();
-        configuration.set("hbase.zookeeper.properity.clientPort", "2181");
-        configuration.set("hbase.zookeeper.quorum", "master");
+        configuration.set("hbase.zookeeper.properity.clientPort", zookeeperPort);
+        configuration.set("hbase.zookeeper.quorum", zookeeperIp);
         try {
-            hBaseAdmin = new HBaseAdmin(configuration);
+            connection= ConnectionFactory.createConnection(configuration, executor);
+            hBaseAdmin = connection.getAdmin();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
-    public void createTable(String tableName, List<String> columnFamilyNames) throws IOException {
-        boolean isExsits = hBaseAdmin.tableExists(tableName);
+    public IHbaseClient createTable(String tableName, List<String> columnFamilyNames) throws IOException {
+        TableName tn=TableName.valueOf(tableName);
+        boolean isExsits = connection.getAdmin().tableExists(tn);
         if (isExsits) {
-            return;
+            return this;
         }
-        HTableDescriptor descriptor = new HTableDescriptor(tableName);
+        HTableDescriptor descriptor = new HTableDescriptor(tn);
         for (int i = 0; i < columnFamilyNames.size(); i++) {
             descriptor.addFamily(new HColumnDescriptor(columnFamilyNames.get(i)));
         }
         hBaseAdmin.createTable(descriptor);
+        return this;
     }
 
-    public void bulkPut(String tablename, String columnFamilyName, String rowKey, List<T> data) throws IOException {
-        HConnection hconnection = HConnectionManager.createConnection(configuration);
-        HTableInterface hTableInterface = hconnection.getTable(tablename);
+    public IHbaseClient bulkPut(String tableName, String family,String qualifier, String rowKey, List datas) throws IOException {
+        TableName tn=TableName.valueOf(tableName);
+        Table table = connection.getTable(tn);
         List list = new ArrayList();
-        for (int i = 0; i < data.size(); i++) {
+        for (int i = 0; i < datas.size(); i++) {
             Put put = new Put((rowKey + i).getBytes());
-            put.addColumn(columnFamilyName.getBytes(), ("column").getBytes(), Utils.bean2ByteArray(data.get(i)));
+            put.addColumn(family.getBytes(), qualifier.getBytes(), Utils.bean2ByteArray(datas.get(i)));
             list.add(put);
         }
-        hTableInterface.put(list);
-        hconnection.close();
+        table.put(list);
+        return this;
     }
 
-    public void insertData(String tableName) throws IOException {
-
+    public IHbaseClient put(String tableName, String family,String qualifier, String rowKey,Object data) throws IOException {
+        TableName tn=TableName.valueOf(tableName);
+        Table table = connection.getTable(tn);
+        Put put = new Put((rowKey ).getBytes());
+        put.addColumn(family.getBytes(), qualifier.getBytes(), Utils.bean2ByteArray(data));
+        table.put(put);
+        return this;
     }
 
-    public void dropTable(HBaseAdmin hBaseAdmin, String tableName) throws IOException {
-
+    public IHbaseClient dropTable(String tableName) throws IOException {
+        TableName tn=TableName.valueOf(tableName);
+        hBaseAdmin.deleteTable(tn);
+        return this;
     }
 
-    public void deleteRow(String tablename, String rowkey) throws IOException {
-
+    public IHbaseClient deleteRow(String tableName, String row) throws IOException {
+        TableName tn=TableName.valueOf(tableName);
+        Table table = connection.getTable(tn);
+        Delete delete=new Delete(row.getBytes());
+        table.delete(delete);
+        return this;
     }
 
-    public void deleteByCondition(String tablename, String rowkey) throws IOException {
-
+    public IHbaseClient deleteByCondition(String tablename, String rowkey) throws IOException {
+        return null;
     }
 
-    public void queryAll(String tableName) throws IOException {
-
+    public IHbaseClient queryAll(String tableName) throws IOException {
+        return null;
     }
 
-    public void queryByRowKey(String tableName) throws IOException {
-
+    public IHbaseClient queryByRowKey(String tableName) throws IOException {
+        return null;
     }
 
-    public void queryByColumnValue(String tableName) throws IOException {
-
+    public IHbaseClient queryByColumnValue(String tableName) throws IOException {
+        return null;
     }
 
-    public void queryByFilters(String tableName) throws IOException {
-
+    public IHbaseClient queryByFilters(String tableName) throws IOException {
+        return null;
     }
 }

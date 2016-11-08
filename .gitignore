@@ -1,2 +1,5 @@
 /.idea
 *.iml
+classes
+/mysql-hbase/target/maven-status/maven-compiler-plugin/compile/default-compile/*.lst
+/spark-java/target/maven-status/maven-compiler-plugin/compile/default-compile/*.lst
