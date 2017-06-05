@@ -15,11 +15,13 @@
         <module>esacess</module>
         <module>hbaseacess</module>
         <module>zkacess</module>
-        <!--<module>mysql-hbase</module>-->
+       <module>mysql-hbase</module>
         <module>mysqlacess</module>
         <module>hbase-spark</module>
         <module>spark-scala</module>
-        <!--module>spark-java</module-->
+        <module>spark-java</module>
+        <module>hadoopacess</module>
+        <module>mongdbclient</module>
     </modules>
 
     <properties>
