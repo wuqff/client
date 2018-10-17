@@ -27,7 +27,7 @@ public class CuratorClientTest {
             // 2.1 Create node
             String data1 = "hello";
             print("create", ZK_PATH, data1);
-            client.create().
+            String result = client.create().
                     creatingParentsIfNeeded().
                     forPath(ZK_PATH, data1.getBytes());
 
