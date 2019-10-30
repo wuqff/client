@@ -6,5 +6,5 @@ package com.huawei.wuqf.esacess;
 public class Constant {
     public static String[] descriptions = {"我是一个中国人", "hello world", "无敌最是寂寞"};
 
-    public static int dataCount = 1000;
+    public static int dataCount = 100000;
 }

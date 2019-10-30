@@ -2,8 +2,6 @@ package com.huawei.wuqf.esacess;
 
 
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.count.CountRequest;
-import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -20,8 +18,6 @@ import java.util.List;
 public interface IESclient
 {
     public List<IndexResponse> createIndex(String indexName, String typeName) throws IOException;
-    
-    public ActionFuture<CountResponse> count(CountRequest request);
     
     public ActionFuture<GetResponse> get(GetRequest request);
     
