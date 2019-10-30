@@ -39,13 +39,13 @@ public class ESClient {
 
     public static void main(String[] args) throws IOException {
         ESClient esClient = new ESClient();
-        esClient.init("192.168.0.66", 9300);
+        esClient.init("nc.server", 9300);
         long startTime = System.currentTimeMillis();
 //        esClient.createIndex("users", "user");
         //esClient.bulkIndex("user", "user");
-        esClient.search();
+        esClient.filterSearch();
         long endTime = System.currentTimeMillis();
-        System.out.println("time:" + String.valueOf(endTime - startTime));
+        System.out.println("time:" + String.valueOf(endTime - startTime)+"ms");
         esClient.close();
     }
 
@@ -83,11 +83,30 @@ public class ESClient {
         return getResponse;
     }
 
-    public SearchHit[] search() {
+    public SearchHit[] querySearch() {
         SearchResponse searchResponse = client.prepareSearch("syslog")
                 .setTypes("syslog")
                 .setQuery(QueryBuilders.wildcardQuery("guard", "guard*"))
                 .setQuery(QueryBuilders.termQuery("guard","guard_00_05_b7_e9_20_7b"))
+                .setQuery(QueryBuilders.termQuery("priority","CRITICAL".toLowerCase()))
+                .setQuery(QueryBuilders.termQuery("destIP","192.168.1.255"))
+                .setQuery(QueryBuilders.termQuery("captureTime","1568097485:609052"))
+                .setQuery(QueryBuilders.wildcardQuery("destIP","192.168.1.25*"))
+                .setFrom(0).setSize(60).setExplain(true)
+                .get();
+        SearchHits hits = searchResponse.getHits();
+        System.out.println("hits:" + String.valueOf(hits.getTotalHits()));
+        return hits.getHits();
+    }
+    public SearchHit[] filterSearch() {
+        SearchResponse searchResponse = client.prepareSearch("syslog")
+                .setTypes("syslog")
+                .setPostFilter(QueryBuilders.wildcardQuery("guard", "guard*"))
+                .setPostFilter(QueryBuilders.termQuery("guard","guard_00_05_b7_e9_20_7b"))
+                .setPostFilter(QueryBuilders.termQuery("priority","CRITICAL".toLowerCase()))
+                .setPostFilter(QueryBuilders.termQuery("destIP","192.168.1.255"))
+                .setPostFilter(QueryBuilders.termQuery("captureTime","1568097485:609052"))
+                .setPostFilter(QueryBuilders.wildcardQuery("destIP","192.168.1.25*"))
                 .setFrom(0).setSize(60).setExplain(true)
                 .get();
         SearchHits hits = searchResponse.getHits();
