@@ -15,7 +15,7 @@
         <module>esacess</module>
         <module>hbaseacess</module>
         <module>zkacess</module>
-       <module>mysql-hbase</module>
+        <module>mysql-hbase</module>
         <module>mysqlacess</module>
         <module>hbase-spark</module>
         <module>spark-scala</module>
@@ -30,6 +30,7 @@
         <elasticsearch.version>5.6.8</elasticsearch.version>
         <spark.version>2.0.1</spark.version>
         <lombok.version>1.16.6</lombok.version>
+        <junit.version>4.13.1</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -83,7 +84,11 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
