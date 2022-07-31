@@ -1,1 +1,1 @@
-# client packaging
+# middleware clients
